@@ -193,7 +193,36 @@ Verified = jose_jwt:verify(JWK, CompactSigned).
 Verified =:= jose_jwt:verify(JWK, Signed).
 % true
 ```
+##### JSON Web Encryption (JWE) of JSON Web Token (JWT) using A256GCMKW with JSON Web Key (JWK)
 
+_Elixir_
+
+```elixir
+# JSON Web Key (JWK)
+jwk = %{
+  "kty" => "oct",
+  "k" => :base64url.encode("symmetric key")
+}
+
+# JSON Web Encription (JWE)
+jwe = %{
+  "alg" => "A256GCMKW",
+  "enc" => "A256GCM",
+  "zip" => "DEF"
+}
+
+# JSON Web Token (JWT)
+jwt = %{
+  "iss" => "joe",
+  "exp" => 1300819380,
+  "http://example.com/is_root" => true
+}
+
+encryped = JOSE.JWT.encrypt(jwk, jwe, jwt)
+compact_encryped = JOSE.JWE.compact(encrypted) |> elem(1)
+
+JOSE.JWT.decrypt(:base64url.decode(jwk["k"]), compact_encrypted)
+```
 ##### Reading JSON Web Keys (JWK) from PEM files
 
 The examples below use three keys created with `openssl`:
